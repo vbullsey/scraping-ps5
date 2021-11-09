@@ -1,4 +1,12 @@
 const { chromium } = require('playwright')
+const { TwitterClient } = require('twitter-api-client')
+
+const twitterClient = new TwitterClient({
+  apiKey: process.env.TWITTER_API_KEY,
+  apiSecret: process.env.TWITTER_API_SECRET,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+})
 
 const shops = [
   {
@@ -56,7 +64,10 @@ const shops = [
         // )
         // return content.includes('0') === false
 
-        const content = await page.textContent('.product-single__availability-item', { timeout: 5000 })
+        const content = await page.textContent(
+          '.product-single__availability-item',
+          { timeout: 5000 }
+        )
 
         const stock = parseInt(content.replace(/\s/g, '').slice(8))
 
@@ -83,6 +94,13 @@ const shops = [
         hasStock ? 'Has Stock!!!' : 'Out of Stock '
       }`
     )
+    await page.close()
+
+    if (hasStock) {
+      twitterClient.tweets.statusesUpdate({
+        status: `Está disponible ${description} en la tienda ${vendor}, esté es el link: ${url}`
+      })
+    }
   }
 
   await browser.close()

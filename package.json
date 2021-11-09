@@ -12,5 +12,8 @@
   },
   "eslintConfig": {
     "extends": "standard"
+  },
+  "dependencies": {
+    "twitter-api-client": "^1.4.0"
   }
 }
